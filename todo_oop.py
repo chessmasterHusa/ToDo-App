@@ -11,7 +11,7 @@ class Priority(Enum):
     MEDIUM: int = 1
     HIGH: int = 2
 
-class Openning_Message(Enum):
+class OpeningMessage(Enum):
     EXIT: int = 0
     CREATE: int = 1
     UPDATE: int = 2
@@ -99,14 +99,14 @@ class CMDInterface(Interface):
 
         while True:
             try:
-                msg_code = Openning_Message(int(input(self.opening_message)))
+                msg_code = OpeningMessage(int(input(self.opening_message)))
             except:
                 self.clear_screen()
                 print("INVALID CHOICE, PLEASE SELECT A VALID NUMBER\n")
                 continue
-            if Openning_Message.EXIT == msg_code:
+            if OpeningMessage.EXIT == msg_code:
                 break
-            elif Openning_Message.CREATE == msg_code:
+            elif OpeningMessage.CREATE == msg_code:
                 description = input("Add a task description :\t")
                 while True:
                     try:
@@ -116,9 +116,9 @@ class CMDInterface(Interface):
                         print("INVALID CHOICE, PLEASE SELECT A VALID NUMBER\n")
                 task = Task(description=description, priority=priority)
                 self.todo.add_task(task)
-            elif Openning_Message.UPDATE == msg_code:
+            elif OpeningMessage.UPDATE == msg_code:
                 pass
-            elif Openning_Message.SHOW == msg_code:
+            elif OpeningMessage.SHOW == msg_code:
                 pass
             self.clear_screen()
                 
