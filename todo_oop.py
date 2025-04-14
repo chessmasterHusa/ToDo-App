@@ -1,5 +1,5 @@
 from enum import Enum
-
+import os
 
 class Status(Enum):
     NOT_STARTED: int = 0
@@ -10,6 +10,12 @@ class Priority(Enum):
     LOW: int = 0
     MEDIUM: int = 1
     HIGH: int = 2
+
+class Openning_Message(Enum):
+    EXIT: int = 0
+    CREATE: int = 1
+    UPDATE: int = 2
+    SHOW: int = 3
 
 
 class Task:
@@ -75,21 +81,47 @@ class Interface:
 
 class CMDInterface(Interface):
 
-    def __init__(self):
+    def __init__(self, todo: Todo):
         super().__init__()
-        
+        self.todo = todo
         self.opening_message = "\n".join([
             "Please choose an option: ",
             "1. create a task",
-            "2. list all tasks",
-            "3. modify & update a task"
-        ]) 
+            "2. modify & update a task",
+            "3. list all tasks",
+            "0. exit\n"
+        ])
+    
+    def clear_screen(self):
+        os.system("cls")
 
     def run(self):
 
         while True:
-            print(self.opening_message) 
-            input()
+            try:
+                msg_code = Openning_Message(int(input(self.opening_message)))
+            except:
+                self.clear_screen()
+                print("INVALID CHOICE, PLEASE SELECT A VALID NUMBER\n")
+                continue
+            if Openning_Message.EXIT == msg_code:
+                break
+            elif Openning_Message.CREATE == msg_code:
+                description = input("Add a task description :\t")
+                while True:
+                    try:
+                        priority = Priority(int(input("Add a task priority (Low=0, Medium=1, High=2) :\t")))
+                        break
+                    except:
+                        print("INVALID CHOICE, PLEASE SELECT A VALID NUMBER\n")
+                task = Task(description=description, priority=priority)
+                self.todo.add_task(task)
+            elif Openning_Message.UPDATE == msg_code:
+                pass
+            elif Openning_Message.SHOW == msg_code:
+                pass
+            self.clear_screen()
+                
 
 
 class QTInterface(Interface):
@@ -112,12 +144,13 @@ class WebInterface(Interface):
 
 if __name__ == "__main__":
 
-    cmd = CMDInterface()
+    todo = Todo()
+    cmd = CMDInterface(todo)
     cmd.start()
-    # cmd.run()
+    cmd.run()
 
-    qt = QTInterface()
-    qt.start()
+    # qt = QTInterface()
+    # qt.start()
 
 
     # task = Task(
