@@ -26,6 +26,11 @@ class CreateOption(Enum):
     DISCARD: int = 1
 
 
+class OS(Enum):
+    LINUX: int = 0
+    WINDOWS: int = 1
+
+
 class Task:
 
     id_counter: int = 0
@@ -143,8 +148,10 @@ class Logger:
 class CMDLogger(Logger):
     """" This class is used to handle all prints of `CDMInterface` """
 
-    def __init__(self):
+    def __init__(self, os: OS = OS.LINUX):
         super().__init__()
+
+        self.os = os 
 
         self.bar_length: int = 30
  
@@ -179,7 +186,12 @@ class CMDLogger(Logger):
         input("\nContinue...")
 
     def clear(self):
-        os.system("clear")
+        if self.os is OS.LINUX:
+            os.system("clear")
+        elif self.os is OS.WINDOWS:
+            os.system("cls")
+        else:
+            raise ValueError("'os' must be a 'OS' option.")
 
     def menu_option_cls(self):
         self.clear()
@@ -221,11 +233,12 @@ class CMDReader:
 
 class CMDInterface(Interface):
 
-    def __init__(self, task_db: TaskDB):
+    def __init__(self, task_db: TaskDB, os: OS = OS.LINUX):
         super().__init__()
 
         self.task_db = task_db
-        self.logger = CMDLogger()
+
+        self.logger = CMDLogger(os=os)
         self.reader = CMDReader(logger= self.logger)
 
         self.running: bool = True  
@@ -316,5 +329,6 @@ class WebInterface(Interface):
 if __name__ == "__main__":
 
     task_db = TaskDB()
-    cmd = CMDInterface(task_db=task_db)
+    cmd = CMDInterface(task_db=task_db, os=OS.LINUX)
     cmd.run()
+    
