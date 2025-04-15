@@ -82,7 +82,7 @@ class Todo:
     def add_task(self, task: Task):
         self.tasks.append(task)
     
-    def all_tasks(self):
+    def show_tasks(self, task: Task):
         return self.tasks
 
     def get_task_by_id(self, id: int):
@@ -98,8 +98,6 @@ class Todo:
     # def update_task(self, task: Task):
     #     pass
     
-    # def show_tasks(self, task: Task):
-    #     pass
 
 
 class Interface:
@@ -145,9 +143,14 @@ class CMDInterface(Interface):
                 print("INVALID CHOICE, PLEASE SELECT A VALID NUMBER\n")
                 continue
             if OpeningMessage.EXIT == msg_code:
+                self.clear_screen()
+                print("END")
                 break
             elif OpeningMessage.CREATE == msg_code:
-                description = input("Add a task description :\t")
+                while True:
+                    description = input("Add a task description :\t")
+
+                    break
                 while True:
                     try:
                         priority = Priority(int(input("Add a task priority (0:Low, 1:Medium, 2:High) :\t")))
@@ -159,10 +162,9 @@ class CMDInterface(Interface):
                 self.clear_screen()
                 print(f"Task {description} is created\n\n")
             elif OpeningMessage.UPDATE == msg_code:
-                pass
-                # for task in Todo.tasks:
-                #     print(task)
-                # self.todo.get_task_by_id()
+                for task in self.todo.tasks:
+                    print(task)
+                self.todo.get_task_by_id()
                 # self.clear_screen()
             elif OpeningMessage.SHOW == msg_code:
                 self.clear_screen()
