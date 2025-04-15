@@ -20,12 +20,6 @@ class MenuOption(Enum):
     UPDATE: int = 2
     SHOW: int = 3
 
-
-class CreateOption(Enum):
-    SAVE: int = 0
-    DISCARD: int = 1
-
-
 class OS(Enum):
     LINUX: int = 0
     WINDOWS: int = 1
@@ -331,4 +325,3 @@ if __name__ == "__main__":
     task_db = TaskDB()
     cmd = CMDInterface(task_db=task_db, os=OS.LINUX)
     cmd.run()
-    
