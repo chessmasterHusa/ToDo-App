@@ -2,7 +2,7 @@ from enum import Enum
 import sys
 import os
 
-from typing import Self, Optional
+from typing import Optional
 
 class Status(Enum):
     NOT_STARTED: int = 0
@@ -73,7 +73,7 @@ class Task:
     def set_task_db(self, task_db: 'TaskDB'):
         self.task_db = task_db 
     
-    def save(self) -> Self:
+    def save(self) -> 'Self':
         if (self.task_db is None) and not isinstance(self.task_db, TaskDB):
             raise AttributeError('`task_db` must be not None, use `set_task_db`')
          
