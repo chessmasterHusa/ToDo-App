@@ -33,7 +33,9 @@ class CMDLogger(Logger):
             "task_desc": "Task Desciprion: ",
             "task_priority": "Choose the task priority (0. LOW, 1. Medium, 2. High): ",
             "task_created": "Task is created: ",
-            "tasks_list": "Tasks"
+            "tasks_list": "Tasks",
+            "get_task_id" : "Choose The Task ID: ",
+            "invalid_task_id": "Invalid Task IDs, please choose a valid one."
         }   
     
     def add_bar(self, length):
@@ -66,7 +68,6 @@ class CMDReader:
     def __init__(self, logger: CMDLogger):
         self.logger = logger 
 
-
     def read_option(self, msg: str, enum: Enum) -> Optional[Enum]:
 
         try:
@@ -93,6 +94,13 @@ class CMDReader:
             enum= Priority
         )
 
+    def get_task_id(self):
+        
+        try:
+            return int(input(self.logger.messages["get_task_id"]))
+        except:
+            return None 
+
 class CMDInterface(Interface):
 
     def __init__(self, task_db: TaskDB, os: OSType = OSType.LINUX):
@@ -113,7 +121,7 @@ class CMDInterface(Interface):
 
         if priority is not None:
 
-            task = self.task_db.create(description=desc, priority=priority).save()  
+            task = self.task_db.create_task(description=desc, priority=priority).save()  
 
             self.logger.log(
                 "\n", self.logger.messages["task_created"], self.logger.add_bar(length=100), repr(task)
@@ -127,8 +135,27 @@ class CMDInterface(Interface):
 
     def update_task(self):
         self.logger.clear()
+        
+        self.list_all_tasks(continue_=False)
 
-    def list_all_tasks(self):
+        task_id: Optional[int] = self.reader.get_task_id()
+
+        if (task_id is not None) and task_id in list(map(lambda task: task.id, self.task_db.list())):
+            
+            # Todo: 
+            # self.task_db.update_task(
+            #     task_id= task_id,
+            #     task = 
+            # )
+
+            ... 
+
+        else:
+            self.logger.log(self.logger.messages["invalid_task_id"])   
+            self.logger.continue_()                                               
+
+
+    def list_all_tasks(self, continue_: bool = True):
         self.logger.clear()
 
         self.logger.log(
@@ -138,7 +165,8 @@ class CMDInterface(Interface):
             ])
         )
         
-        self.logger.continue_()
+        if continue_:
+            self.logger.continue_()
 
     def run(self):
     

@@ -1,7 +1,6 @@
 from taskito.enums import Priority, Status
 
 
-
 class Task:
 
     id_counter: int = 0
@@ -67,7 +66,7 @@ class TaskDB:
     def add_task(self, task: Task):
         self.tasks.append(task)
 
-    def create(
+    def create_task(
         self, 
         description: str,
         priority: Priority,
