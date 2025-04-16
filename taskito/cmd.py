@@ -1,151 +1,19 @@
-from enum import Enum
-import sys
-import os
-
+from taskito._base import Logger, Interface
+from taskito.enums import Enum, Status, Priority, MenuOption, OSType
 from typing import Optional
 
-class Status(Enum):
-    NOT_STARTED: int = 0
-    IN_PROGRESS: int = 1
-    DONE: int = 2
+from taskito.task import Task, TaskDB
 
-class Priority(Enum):
-    LOW: int = 0
-    MEDIUM: int = 1
-    HIGH: int = 2
-
-class MenuOption(Enum):
-    EXIT: int = 0
-    CREATE: int = 1
-    UPDATE: int = 2
-    SHOW: int = 3
-
-class OS(Enum):
-    LINUX: int = 0
-    WINDOWS: int = 1
-
-
-class Task:
-
-    id_counter: int = 0
-
-    description: str
-    priority: Priority
-
-    task_db: 'TaskDB' = None 
-
-    def __init__(
-        self,
-        description: str,
-        priority: Priority,
-        status: Status = Status.NOT_STARTED
-    ):
-        self.id: int = self.get_id()
-        self.set_description(description=description)
-        self.set_priority(priority=priority)
-
-        self.status = status
-
-        self.max_len_desc: int = 60
-        
-    def set_description(self, description: str):
-        if not isinstance(description, str):
-            raise ValueError(f"'desciption' must be a string, but {type(description)} is found.")
-
-        self.description = description
-
-    def set_priority(self, priority: Priority):
-        if not isinstance(priority, Priority):
-            raise ValueError(f"'priority' must be a string, but {type(priority)} is found.")
-
-        self.priority = priority
-
-    def __repr__(self) -> str: 
-
-        desc = self.description[:min(self.max_len_desc, len(self.description)) + 1]
-
-        return f"Task(id={self.id}, desc=`{desc}{'...' if len(self.description) > self.max_len_desc else ''}`, status={self.status.name}, priority={self.priority.name})"
-    
-    def get_id(self):
-        Task.id_counter += 1
-        return Task.id_counter
-    
-    def set_task_db(self, task_db: 'TaskDB'):
-        self.task_db = task_db 
-    
-    def save(self) -> 'Self':
-        if (self.task_db is None) and not isinstance(self.task_db, TaskDB):
-            raise AttributeError('`task_db` must be not None, use `set_task_db`')
-         
-        self.task_db.add_task(self)
-
-        return self 
-
-
-class TaskDB:
-
-    def __init__(self):
-        self.tasks: list[Task] = []
-
-    def add_task(self, task: Task):
-        self.tasks.append(task)
-
-    def create(
-        self, 
-        description: str,
-        priority: Priority,
-        status: Status = Status.NOT_STARTED
-    ) -> Task:
-        
-        task = Task(description=description, priority=priority, status=status)
-        task.set_task_db(task_db=self)
-
-        return task 
-    
-    def list(self):
-        return self.tasks
-    
-    def __repr__(self):
-        
-        tasks_list_repr = ",\n".join([
-            "\t" + repr(task) for task in self.list()
-        ])
-
-        return f"{self.__class__.__name__}([\n{tasks_list_repr}\n])"
-
-
-
-class Interface:
-
-    def __init__(self):
-        ... 
-
-    def run(self):
-        ...
-
-    def exit(self):
-        sys.exit()
-
-    def start(self):
-        print(f"{self.__class__.__name__} is started")
-
-
-class Logger:
-    """" This class is used to handle all prints in the screen defined by `Interface` """
-    def __init__(self):
-        ... 
-
-    def log(self):
-        ... 
+import os 
 
 
 class CMDLogger(Logger):
     """" This class is used to handle all prints of `CDMInterface` """
 
-    def __init__(self, os: OS = OS.LINUX):
+    def __init__(self, os_type: OSType = OSType.LINUX):
         super().__init__()
 
-        self.os = os 
+        self.os_type = os_type 
 
         self.bar_length: int = 30
  
@@ -180,9 +48,9 @@ class CMDLogger(Logger):
         input("\nContinue...")
 
     def clear(self):
-        if self.os is OS.LINUX:
+        if self.os_type is OSType.LINUX:
             os.system("clear")
-        elif self.os is OS.WINDOWS:
+        elif self.os_type is OSType.WINDOWS:
             os.system("cls")
         else:
             raise ValueError("'os' must be a 'OS' option.")
@@ -227,12 +95,12 @@ class CMDReader:
 
 class CMDInterface(Interface):
 
-    def __init__(self, task_db: TaskDB, os: OS = OS.LINUX):
+    def __init__(self, task_db: TaskDB, os: OSType = OSType.LINUX):
         super().__init__()
 
         self.task_db = task_db
 
-        self.logger = CMDLogger(os=os)
+        self.logger = CMDLogger(os_type=os)
         self.reader = CMDReader(logger= self.logger)
 
         self.running: bool = True  
@@ -301,27 +169,3 @@ class CMDInterface(Interface):
             else:
                 self.logger.menu_option_cls()
                 self.logger.log(msg="invalid_option")
-
-class QTInterface(Interface):
-
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        ... 
-
-
-class WebInterface(Interface):
-
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        pass 
-
-
-if __name__ == "__main__":
-
-    task_db = TaskDB()
-    cmd = CMDInterface(task_db=task_db, os=OS.LINUX)
-    cmd.run()
