@@ -169,3 +169,30 @@ class CMDInterface(Interface):
             else:
                 self.logger.menu_option_cls()
                 self.logger.log(msg="invalid_option")
+<<<<<<< HEAD:taskito/cmd.py
+=======
+
+class QTInterface(Interface):
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        ... 
+
+
+class WebInterface(Interface):
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        pass 
+
+
+if __name__ == "__main__":
+
+    task_db = TaskDB()
+    cmd = CMDInterface(task_db=task_db, os=OS.WINDOWS)
+    cmd.run()
+>>>>>>> 9e3495838a5d3a34eeafcf89b5b34afefb01fe19:todo_oop_jamor.py
