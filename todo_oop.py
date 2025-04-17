@@ -7,9 +7,9 @@ class Status(Enum):
     2 : IN_PROGRESS
     3 : DONE
     """
-    NOT_STARTED: int = auto()
-    IN_PROGRESS: int = auto()
-    DONE: int = auto()
+    NOT_STARTED = auto()
+    IN_PROGRESS = auto()
+    DONE = auto()
 
 class Priority(Enum):
     """
@@ -17,9 +17,9 @@ class Priority(Enum):
     2 : MEDIUM
     3 : HIGH
     """
-    LOW: int = auto()
-    MEDIUM: int = auto()
-    HIGH: int = auto()
+    LOW = auto()
+    MEDIUM = auto()
+    HIGH = auto()
 
 class OpeningMessage(Enum):
     """
@@ -29,11 +29,11 @@ class OpeningMessage(Enum):
     4 : SHOW
     0 : EXIT
     """
-    CREATE: int = auto()
-    UPDATE: int = auto()
-    DELETE: int = auto()
-    SHOW: int = auto()
-    EXIT: int = 0
+    CREATE = auto()
+    UPDATE = auto()
+    DELETE = auto()
+    SHOW = auto()
+    EXIT = 0
 
 class UpdatingMessage(Enum):
     """
@@ -41,9 +41,9 @@ class UpdatingMessage(Enum):
     2 : by description
     0 : cancel
     """
-    BY_ID: int = auto()
-    BY_DESCRIPTION: int = auto()
-    EXIT: int = 0
+    BY_ID = auto()
+    BY_DESCRIPTION = auto()
+    EXIT = 0
 
 
 class Task:
@@ -169,12 +169,29 @@ class CMDInterface(Interface):
                 continue
             if OpeningMessage.EXIT == msg_code:
                 self.clear_screen()
-                print("END")
-                break
-            elif OpeningMessage.CREATE == msg_code:
                 while True:
-                    description = input("Add a task description :\t")
+                    want_to_exit = input("Are you really want to quit ? (Y/N)\n")
+                    if want_to_exit.upper() == "Y":
+                        self.clear_screen()
+                        print("Thank you for using my app to create tour daily tasks\n")
+                        quit()
+                    elif want_to_exit.upper() == "N":
+                        self.clear_screen()
+                        break
+                    else:
+                        print("Please select a valid choice\t(Y : Yes\tN : No)\n")
 
+            elif OpeningMessage.CREATE == msg_code:
+                self.clear_screen()
+                while True:
+                    description = input("Add a task description :\n")
+                    if not description:
+                        print("Description cannot be empty.\n")
+                        continue
+                    if any(description.lower() == task.description.lower() for task in self.todo.tasks):
+                        self.clear_screen()
+                        print(f"A task with the description : {description} already exists. Please enter a different one.\n")
+                        continue
                     break
                 while True:
                     try:
@@ -185,14 +202,14 @@ class CMDInterface(Interface):
                 task = Task(description=description, priority=priority)
                 self.todo.add_task(task)
                 self.clear_screen()
-                print(f"Task {description} is created\n\n")
+                print(f"Task '{description}' is created successfully.\n")
             
             elif OpeningMessage.UPDATE == msg_code:
-                todo.show_tasks()
+                self.todo.show_tasks()
                 while True:
                     task_to_update = int(input("Choose the number of the task you want to update/modify\t(Tape 0 to exit)\n"))
-                    if task_to_update in [the_task[0] for the_task in todo.get_all_tasks()]:
-                        task_to_update = [the_task[1] for the_task in todo.get_all_tasks() if the_task[0] == task_to_update]
+                    if task_to_update in [the_task[0] for the_task in self.todo.get_all_tasks()]:
+                        task_to_update = [the_task[1] for the_task in self.todo.get_all_tasks() if the_task[0] == task_to_update]
                         update_by_id_description = UpdatingMessage(int(input("Choose with which way you want to update the task\n1 : by id\n2 : by description\n")))
                         if UpdatingMessage.BY_ID == update_by_id_description:
                             task_to_update = self.todo.get_task_by_id(task_to_update)
@@ -240,7 +257,7 @@ if __name__ == "__main__":
 
     todo = Todo()
     cmd = CMDInterface(todo)
-    cmd.start()
+    # cmd.start()
     cmd.run()
 
     # qt = QTInterface()
